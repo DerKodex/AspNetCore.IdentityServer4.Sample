@@ -24,7 +24,7 @@ COPY docker/certs/${env}.pfx /etc/docker/certs/
 RUN mv /etc/docker/certs/${env}.pfx /etc/docker/certs/docker.pfx
 VOLUME /app/App_Data/Logs
 
-ENV TZ "Asia/Taipei"
+ENV TZ "America/Buenos_Aires"
 # ENV LANG "zh_TW.UTF-8"
 # ENV LANGUAGE "zh_TW.UTF-8"
 # ENV LC_ALL "zh_TW.UTF-8"
@@ -36,4 +36,4 @@ EXPOSE 6000 6001
 
 ENTRYPOINT ["dotnet", "AspNetCore.IdentityServer4.Auth.dll"]
 
-LABEL org.opencontainers.image.source=https://github.com/karatejb/AspNetCore.IdentityServer4.Sample
+LABEL org.opencontainers.image.source=https://github.com/DerKodex/AspNetCore.IdentityServer4.Sample
