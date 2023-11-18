@@ -6,10 +6,9 @@ on:
         - master
         - dev
 env:
-  IMG_AUTH: idsrv4-auth
-  IMG_BACKEND: idsrv4-backend
-  IMG_NGINX: idsrv4-nginx
-  IMG_OPENLDAP: openldap
+  IMG_AUTH: is-auth
+  IMG_BACKEND: is-backend
+  IMG_NGINX: is-nginx
   IMG_TAG_DEFAULT: latest
 jobs:
   push_images_to_dockerhub:
@@ -49,92 +48,3 @@ jobs:
           file: ./docker/nginx.dockerfile
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMG_NGINX }}:${{ env.IMG_TAG_DEFAULT }}
-  push_images_to_acr:
-    name: Push images to ACR
-    runs-on: ubuntu-18.04
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
-      - name: Login to ACR
-        uses: azure/docker-login@v1
-        with:
-          login-server: ${{ secrets.ACR_REGISTRY }}
-          username: ${{ secrets.ACR_USERNAME }}
-          password: ${{ secrets.ACR_PASSWORD }}
-      - name: Build and push Auth
-        id: build_publish_auth
-        uses: docker/build-push-action@v2
-        with:
-          # context: .
-          file: ./docker/auth.dockerfile
-          push: true
-          tags: ${{ secrets.ACR_REGISTRY }}/${{ env.IMG_AUTH }}:${{ env.IMG_TAG_DEFAULT }}
-      - name: Build and push backend
-        id: build_publish_backend
-        uses: docker/build-push-action@v2
-        with:
-          # context: .
-          file: ./docker/backend.dockerfile
-          push: true
-          tags: ${{ secrets.ACR_REGISTRY }}/${{ env.IMG_BACKEND }}:${{ env.IMG_TAG_DEFAULT }}
-      - name: Build and push nginx
-        id: build_publish_nginx
-        uses: docker/build-push-action@v2
-        with:
-          context: ./docker
-          file: ./docker/nginx.dockerfile
-          push: true
-          tags: ${{ secrets.ACR_REGISTRY }}/${{ env.IMG_NGINX }}:${{ env.IMG_TAG_DEFAULT }}
-      - name: Pull and push openldap
-        id: publish_openldap
-        run: |
-          docker pull osixia/openldap:stable
-          docker tag osixia/openldap:stable ${{ secrets.ACR_REGISTRY }}/${{ env.IMG_OPENLDAP }}:stable
-          docker push ${{ secrets.ACR_REGISTRY}}/${{ env.IMG_OPENLDAP }}:stable
-  push_images_to_ghcr:
-    name: Push images to GitHub Container Registry
-    # env:
-    #   REPO: karatejb/aspnetcore.identityserver4.sample # The value should be lowercase for image name. Or just use ${{ github.repository }}.
-    runs-on: ubuntu-18.04
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GH_TOKEN }}
-      - name: Set environment variables
-        run: |
-          echo "REPO=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
-      - name: Build and push auth
-        id: build_publish_auth
-        uses: docker/build-push-action@v2
-        with:
-          # context: .
-          file: ./docker/auth.dockerfile
-          push: true
-          tags: ghcr.io/${{ env.REPO }}/${{ env.IMG_AUTH }}:${{ env.IMG_TAG_DEFAULT }}
-      - name: Build and push backend
-        id: build_publish_backend
-        uses: docker/build-push-action@v2
-        with:
-          # context: .
-          file: ./docker/backend.dockerfile
-          push: true
-          tags: ghcr.io/${{ env.REPO }}/${{ env.IMG_BACKEND }}:${{ env.IMG_TAG_DEFAULT }}
-      - name: Build and push nginx
-        id: build_publish_nginx
-        uses: docker/build-push-action@v2
-        with:
-          context: ./docker
-          file: ./docker/nginx.dockerfile
-          push: true
-          tags: ghcr.io/${{ env.REPO }}/${{ env.IMG_NGINX }}:${{ env.IMG_TAG_DEFAULT }}
-      - name: Pull and push openldap
-        id: publish_openldap
-        run: |
-          docker pull osixia/openldap:stable
-          docker tag osixia/openldap:stable ghcr.io/${{ env.REPO }}/${{ env.IMG_OPENLDAP }}:stable
-          docker push ghcr.io/${{ env.REPO }}/${{ env.IMG_OPENLDAP }}:stable
