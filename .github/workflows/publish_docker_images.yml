@@ -29,7 +29,7 @@ jobs:
           # context: .
           file: ./docker/auth.dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMG_AUTH }}:${{ env.IMG_TAG_DEFAULT }}
+          tags: registry.xaas.ar/${{ env.IMG_AUTH }}:${{ env.IMG_TAG_DEFAULT }}
       # - name: Image digest
       #   run: echo ${{ steps.build_publish_auth.outputs.digest }}
       - name: Build and push backend
@@ -39,7 +39,7 @@ jobs:
           # context: .
           file: ./docker/backend.dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMG_BACKEND }}:${{ env.IMG_TAG_DEFAULT }}
+          tags: registry.xaas.ar/${{ env.IMG_BACKEND }}:${{ env.IMG_TAG_DEFAULT }}
       - name: Build and push nginx
         id: build_publish_nginx
         uses: docker/build-push-action@v2
@@ -47,4 +47,4 @@ jobs:
           context: ./docker
           file: ./docker/nginx.dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMG_NGINX }}:${{ env.IMG_TAG_DEFAULT }}
+          tags: registry.xaas.ar/${{ env.IMG_NGINX }}:${{ env.IMG_TAG_DEFAULT }}
